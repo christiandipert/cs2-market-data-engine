@@ -1,6 +1,10 @@
 from typing import Dict, List, Optional
 from steam.steam_client import SteamClient
+from steam.steam_client import Games
 from bitskins.bitskins_client import BitskinsClient
+
+
+# Will query C++ engine for arbitrage and strategy calculations
 
 class MarketFetcher:
     def __init__(self):
@@ -23,7 +27,28 @@ class MarketFetcher:
             'bitskins': bitskins_data,
             'last_updated': datetime.now().isoformat()
         }
-        
+
+    def steam_popular_items(self, game: Games) -> List[str]:
+        """
+        Get popular items for a game
+        """
+        return self.steam_client.get_popular_items(game)
+    
+    def steam_price_overview(self, market_hash_name: str) -> Optional[Dict]:
+        """
+        Get price overview for a specific item
+        """
+        return self.steam_client.get_price_overview(market_hash_name)
+
+    # Test steam client
+    def get_all_items(self, game: Games) -> List[str]:
+        """
+        Get all items for a game
+        """
+        result = self.steam_client.get_all_items(game)
+        print(result)
+        return result
+
     def get_arbitrage_opportunities(self, market_hash_names: List[str]) -> List[Dict]:
         """
         Find arbitrage opportunities between Steam and Bitskins

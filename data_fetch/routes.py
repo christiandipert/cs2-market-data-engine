@@ -2,7 +2,8 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Dict
 from market_fetcher import MarketFetcher
-from local.storage import MarketStorage
+from model.storage import MarketStorage
+from steam.steam_client import Games
 
 app = FastAPI(
     title="CS2 Market Data API",
@@ -26,6 +27,20 @@ storage = MarketStorage()
 @app.get("/")
 async def root():
     return {"message": "CS2 Market Data API"}
+
+@app.get("/popular")
+async def get_popular_items():
+    """
+    Get popular items for a game
+    """
+    return market_fetcher.steam_popular_items(Games.CS2)
+
+@app.get("/items")
+async def get_all_items():
+    """
+    Get all items for a game
+    """
+    return market_fetcher.get_all_items(Games.CS2)
 
 @app.get("/items/{market_hash_name}")
 async def get_item_data(market_hash_name: str):
@@ -61,6 +76,14 @@ async def get_item_history(market_hash_name: str, days: int = 30):
         return {"history": history}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@app.get("/priceoverview")
+async def get_price_overview(query: str):
+    """
+    Get price overview for a specific item
+    """
+    print("GOT REQUEST FOR " + query)
+    return market_fetcher.steam_price_overview(query)
 
 @app.get("/arbitrage")
 async def get_arbitrage_opportunities():

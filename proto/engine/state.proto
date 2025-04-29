@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+package engine;
+
+/*
+Interface for bridging cpp data calculations with python fastapi service (data_fetch)
+*/
+service LogicEngine {
+    rpc GetLogicEngineState(GetLogicEngineStateRequest) returns (GetLogicEngineStateResponse) {}
+}
+
+message GetLogicEngineStateRequest {}
+
+message GetLogicEngineStateResponse {
+    string state = 1;
+}
