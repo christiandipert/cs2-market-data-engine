@@ -65,6 +65,7 @@ async def get_item_history(market_hash_name: str, days: int = 30):
 @app.get("/arbitrage")
 async def get_arbitrage_opportunities():
     """Get current arbitrage opportunities"""
+    # Will query engine/ c++ bindings for arb
     try:
         # placeholder
         return {"message": "Arbitrage opportunities endpoint"}
