@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from typing import List, Dict
 from market_fetcher import MarketFetcher
-from storage import MarketStorage
+from local.storage import MarketStorage
 
 app = FastAPI(
     title="CS2 Market Data API",
@@ -29,7 +29,9 @@ async def root():
 
 @app.get("/items/{market_hash_name}")
 async def get_item_data(market_hash_name: str):
-    """Get current market data for a specific item"""
+    """
+    Get current market data for a specific item
+    """
     try:
         # Check cache first
         cached_data = storage.get_cached_data(market_hash_name)
@@ -51,7 +53,9 @@ async def get_item_data(market_hash_name: str):
 
 @app.get("/items/{market_hash_name}/history")
 async def get_item_history(market_hash_name: str, days: int = 30):
-    """Get historical price data for an item"""
+    """
+    Get historical price data for an item
+    """
     try:
         history = storage.get_historical_data(market_hash_name, days)
         return {"history": history}
@@ -62,8 +66,7 @@ async def get_item_history(market_hash_name: str, days: int = 30):
 async def get_arbitrage_opportunities():
     """Get current arbitrage opportunities"""
     try:
-        # This would need to be implemented based on your specific requirements
-        # For now, returning a placeholder
+        # placeholder
         return {"message": "Arbitrage opportunities endpoint"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e)) 

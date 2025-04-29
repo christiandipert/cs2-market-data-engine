@@ -1,6 +1,6 @@
 from typing import Dict, List, Optional
-from steam_client import SteamClient
-from bitskins_client import BitskinsClient
+from steam.steam_client import SteamClient
+from bitskins.bitskins_client import BitskinsClient
 
 class MarketFetcher:
     def __init__(self):

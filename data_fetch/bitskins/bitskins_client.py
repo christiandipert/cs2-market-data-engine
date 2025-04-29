@@ -5,7 +5,7 @@ import hmac
 import hashlib
 from datetime import datetime
 from typing import Dict, List, Optional
-from keys.BITSKINS_KEYS import BITSKINS_API_KEY
+from keys.BITSKINS import BITSKINS_API_KEY
 
 class BitskinsClient:
     def __init__(self):

@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-
-const ItemViewer = () => {
+const App = () => {
   const [itemData, setItemData] = useState<itemData | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
@@ -94,4 +93,4 @@ const ItemViewer = () => {
   );
 };
 
-export default ItemViewer;
+export default App;

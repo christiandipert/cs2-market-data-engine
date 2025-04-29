@@ -3,7 +3,7 @@ import os
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional
 
-# TODO: fix
+# TODO: use redis instead of this defunct solution
 class MarketStorage:
     def __init__(self, cache_dir: str = "cache"):
         self.cache_dir = cache_dir

@@ -2,6 +2,8 @@ import requests
 import time
 from typing import Dict, List, Optional
 from datetime import datetime
+from keys.STEAMAPIS import STEAMAPIS_KEY
+from keys.STEAMWEB import STEAMWEB_KEY
 
 # TODO: fix
 class SteamClient:
@@ -30,6 +32,7 @@ class SteamClient:
         }
         
         try:
+            print('get_item_price')
             response = requests.get(endpoint, params=params)
             response.raise_for_status()
             data = response.json()
@@ -44,6 +47,7 @@ class SteamClient:
                 }
             return None
         except Exception as e:
+            # TODO: getting a lot of these...
             print(f"Error fetching data from Steam: {str(e)}")
             return None
             
@@ -52,6 +56,8 @@ class SteamClient:
         Get buy and sell orders for a specific item
         """
         self._rate_limit()
+
+        print('get_item_orders')
         # First get the item_nameid
         listing_url = f"{self.base_url}/listings/730/{market_hash_name}"
         try:
