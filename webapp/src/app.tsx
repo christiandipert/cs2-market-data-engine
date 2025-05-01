@@ -3,6 +3,7 @@ import axios from "axios";
 
 interface MarketSearchProps {
   endpoint: string;
+  isDisabled?: boolean;
   method: "get" | "post";
   placeholder?: string;
   buttonText?: string;
@@ -12,6 +13,7 @@ interface MarketSearchProps {
 
 const MarketSearch = ({
   endpoint,
+  isDisabled,
   method,
   placeholder = "Enter search term",
   buttonText = "Search",
@@ -57,7 +59,7 @@ const MarketSearch = ({
         />
         <button
           onClick={handleSearch}
-          disabled={loading}
+          disabled={loading && !isDisabled}
           className="bg-blue-500 text-white px-4 py-2 rounded ml-2 hover:bg-blue-600 disabled:bg-blue-300"
         >
           {loading ? "Loading..." : buttonText}
@@ -101,16 +103,7 @@ const App: React.FC = () => {
       <MarketSearch
         endpoint="/items"
         method="get"
-        placeholder="Get all items"
-        buttonText="Search"
-        onSearch={handleSearch}
-        onError={handleError}
-      />
-
-      <MarketSearch
-        endpoint="/popular"
-        method="get"
-        placeholder="Get Popular Items. Example search"
+        placeholder="Get all items. This does the loop thing. Why does it do that?"
         buttonText="Search"
         onSearch={handleSearch}
         onError={handleError}
@@ -119,17 +112,18 @@ const App: React.FC = () => {
       <MarketSearch
         endpoint="/priceoverview"
         method="get"
-        placeholder="Get Price Overview. Example search: Operation Breakout Weapon Case"
+        placeholder="Get Price Overview. Just returns a success for some reason"
         buttonText="Search"
         onSearch={handleSearch}
         onError={handleError}
       />
 
       <MarketSearch
-        endpoint="/buff/item"
+        endpoint="/buff/featured"
         method="get"
-        placeholder="Get Buff163 item stats"
+        placeholder="Get buff163 featured items. THIS WORKS! Check cli"
         buttonText="Search"
+        isDisabled={true}
         onSearch={handleSearch}
         onError={handleError}
       />

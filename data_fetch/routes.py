@@ -1,10 +1,8 @@
-from fastapi import FastAPI, HTTPException
-from fastapi.middleware.cors import CORSMiddleware
-from typing import List, Dict
+from fastapi import FastAPI, HTTPException # pyright: ignore
+from fastapi.middleware.cors import CORSMiddleware # pyright: ignore
 from market_fetcher import MarketFetcher
 from model.storage import MarketStorage
 from steam.steam_client import Games
-from pickle import INT
 
 app = FastAPI(
     title="CS2 Market Data API",
@@ -29,59 +27,24 @@ storage = MarketStorage()
 async def root():
     return {"message": "CS2 Market Data API"}
 
-@app.get("/buff/item")
-async def get_buff_item_data(item_id: int):
+@app.get("/buff/featured")
+async def get_buff_featured_items():
     """
-    Get popular items for a game
+    Get featured items for a game. Uses buff163api. Works
     """
-    return market_fetcher.get_item_buff(item_id)
+    return market_fetcher.get_buff_163_featured()
 
 @app.get("/items")
 async def get_all_items():
     """
-    Get all items for a game
+    Get all items for a game. Uses steam client api
     """
     return market_fetcher.get_all_items(Games.CS2)
-
-@app.get("/items/{market_hash_name}")
-async def get_item_data(market_hash_name: str):
-    """
-    Get current market data for a specific item
-    """
-    try:
-        # Check cache first
-        cached_data = storage.get_cached_data(market_hash_name)
-        if cached_data:
-            return cached_data
-
-        # Fetch fresh data if not in cache
-        data = market_fetcher.get_market_data(market_hash_name)
-        if not data:
-            raise HTTPException(status_code=404, detail="Item not found")
-
-        # Cache the data
-        storage.cache_data(market_hash_name, data)
-        storage.update_historical_data(market_hash_name, data)
-
-        return data
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-@app.get("/items/{market_hash_name}/history")
-async def get_item_history(market_hash_name: str, days: int = 30):
-    """
-    Get historical price data for an item
-    """
-    try:
-        history = storage.get_historical_data(market_hash_name, days)
-        return {"history": history}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/priceoverview")
 async def get_price_overview(query: str):
     """
-    Get price overview for a specific item
+    Get price overview for a specific item. Uses steam client api
     """
     print("GOT REQUEST FOR " + query)
     return market_fetcher.steam_price_overview(query)

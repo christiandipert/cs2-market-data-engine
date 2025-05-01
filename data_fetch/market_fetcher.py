@@ -1,5 +1,4 @@
 from typing import Dict, List, Optional
-from typing_extensions import Buffer
 from steam.steam_client import SteamClient
 from steam.steam_client import Games
 from bitskins.bitskins_client import BitskinsClient
@@ -15,16 +14,8 @@ class MarketFetcher:
         self.bitskins_client = BitskinsClient()
         self.buff163_client = Buff163Client()
 
-    def get_item_buff(self, item_id: int) -> Optional[Dict]:
-        """
-        Get item data from Buff163
-        """
-        buff_data = self.buff163_client.get_item(item_id)
-
-        if not buff_data:
-            return None
-
-        return buff_data
+    def get_buff_163_featured(self):
+        return self.buff163_client.get_featured_market()
 
     def get_market_data(self, market_hash_name: str) -> Optional[Dict]:
         """
