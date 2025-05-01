@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import axios from 'axios';
+import React, { useState } from "react";
+import axios from "axios";
 
 interface MarketSearchProps {
   endpoint: string;
-  method: 'get' | 'post';
+  method: "get" | "post";
   placeholder?: string;
   buttonText?: string;
   onSearch: (data: any) => void;
@@ -13,29 +13,30 @@ interface MarketSearchProps {
 const MarketSearch = ({
   endpoint,
   method,
-  placeholder = 'Enter search term',
-  buttonText = 'Search',
+  placeholder = "Enter search term",
+  buttonText = "Search",
   onSearch,
-  onError
+  onError,
 }: MarketSearchProps) => {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleSearch = async () => {
     if (!searchTerm.trim()) return;
-    
+
     setLoading(true);
     setError(null);
-    
+
     try {
       const encodedSearchTerm = encodeURIComponent(searchTerm.trim());
       const response = await axios[method](`http://localhost:8000${endpoint}`, {
-        params: { query: encodedSearchTerm }
+        params: { query: encodedSearchTerm },
       });
       onSearch(response.data);
     } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'An error occurred';
+      const errorMessage =
+        err instanceof Error ? err.message : "An error occurred";
       setError(errorMessage);
       onError?.(errorMessage);
     } finally {
@@ -52,14 +53,14 @@ const MarketSearch = ({
           onChange={(e) => setSearchTerm(e.target.value)}
           placeholder={placeholder}
           className="border p-2 rounded flex-grow"
-          onKeyPress={(e) => e.key === 'Enter' && handleSearch()}
+          onKeyPress={(e) => e.key === "Enter" && handleSearch()}
         />
         <button
           onClick={handleSearch}
           disabled={loading}
           className="bg-blue-500 text-white px-4 py-2 rounded ml-2 hover:bg-blue-600 disabled:bg-blue-300"
         >
-          {loading ? 'Loading...' : buttonText}
+          {loading ? "Loading..." : buttonText}
         </button>
       </div>
       {error && <p className="text-red-500 mt-2">{error}</p>}
@@ -96,7 +97,7 @@ const App: React.FC = () => {
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-2xl font-bold mb-4">CS2 Market Data Viewer</h1>
-      
+
       <MarketSearch
         endpoint="/items"
         method="get"
@@ -123,7 +124,16 @@ const App: React.FC = () => {
         onSearch={handleSearch}
         onError={handleError}
       />
-      
+
+      <MarketSearch
+        endpoint="/buff/item"
+        method="get"
+        placeholder="Get Buff163 item stats"
+        buttonText="Search"
+        onSearch={handleSearch}
+        onError={handleError}
+      />
+
       {itemData && (
         <div className="border p-4 rounded">
           <h2 className="text-xl font-semibold mb-2">{itemData.name}</h2>

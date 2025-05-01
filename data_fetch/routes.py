@@ -4,6 +4,7 @@ from typing import List, Dict
 from market_fetcher import MarketFetcher
 from model.storage import MarketStorage
 from steam.steam_client import Games
+from pickle import INT
 
 app = FastAPI(
     title="CS2 Market Data API",
@@ -28,12 +29,12 @@ storage = MarketStorage()
 async def root():
     return {"message": "CS2 Market Data API"}
 
-@app.get("/popular")
-async def get_popular_items():
+@app.get("/buff/item")
+async def get_buff_item_data(item_id: int):
     """
     Get popular items for a game
     """
-    return market_fetcher.steam_popular_items(Games.CS2)
+    return market_fetcher.get_item_buff(item_id)
 
 @app.get("/items")
 async def get_all_items():
@@ -52,16 +53,16 @@ async def get_item_data(market_hash_name: str):
         cached_data = storage.get_cached_data(market_hash_name)
         if cached_data:
             return cached_data
-            
+
         # Fetch fresh data if not in cache
         data = market_fetcher.get_market_data(market_hash_name)
         if not data:
             raise HTTPException(status_code=404, detail="Item not found")
-            
+
         # Cache the data
         storage.cache_data(market_hash_name, data)
         storage.update_historical_data(market_hash_name, data)
-        
+
         return data
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -93,4 +94,4 @@ async def get_arbitrage_opportunities():
         # placeholder
         return {"message": "Arbitrage opportunities endpoint"}
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e)) 
+        raise HTTPException(status_code=500, detail=str(e))
