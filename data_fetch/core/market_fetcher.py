@@ -1,18 +1,27 @@
 from typing import Dict, List, Optional
 from datetime import datetime
-from ..services.steam.client import SteamClient, Games
-from ..services.bitskins.client import BitskinsClient
-from ..services.buff163.client import Buff163Client
+from services.steam.client import SteamClient, Games
+from services.bitskins.client import BitskinsClient
+from services.buff163.buff163_client import Buff163Wrapper
 
 class MarketFetcher:
     def __init__(self):
         self.steam_client = SteamClient()
         self.bitskins_client = BitskinsClient()
-        self.buff163_client = Buff163Client()
+        self.buff163_client = Buff163Wrapper()
 
+    # Gets the current featured market items from buff
     def get_buff_163_featured(self):
         return self.buff163_client.get_featured_market()
+    
+    def get_buff_163_sell_orders(self, item_id: int) -> List[Dict]:
+        return self.buff163_client.get_sell_orders(item_id)
+    
+    # Gets the price of an item from buff
+    def get_buff_163_item_price(self, item_id: int) -> float:
+        return self.buff163_client.get_item_price(item_id)
 
+    # Steam market data
     def get_market_data(self, market_hash_name: str) -> Optional[Dict]:
         """
         Get combined market data from both Steam and Bitskins

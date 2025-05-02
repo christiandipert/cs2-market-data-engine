@@ -110,7 +110,7 @@ const App: React.FC = () => {
       />
 
       <MarketSearch
-        endpoint="/priceoverview"
+        endpoint="/priceoverview/{market_hash_name}"
         method="get"
         placeholder="Get Price Overview. Just returns a success for some reason"
         buttonText="Search"
@@ -127,6 +127,25 @@ const App: React.FC = () => {
         onSearch={handleSearch}
         onError={handleError}
       />
+
+      <MarketSearch
+        endpoint="/buff/item/{item_id}"
+        method="get"
+        placeholder="Get buff163 item price."
+        buttonText="Search"
+        onSearch={handleSearch}
+        onError={handleError}
+      />
+
+      <MarketSearch
+        endpoint="/buff/sell_orders/{item_id}"
+        method="get"
+        placeholder="Get buff163 sell orders."
+        buttonText="Search" 
+        onSearch={handleSearch}
+        onError={handleError}
+      />
+
 
       {itemData && (
         <div className="border p-4 rounded">

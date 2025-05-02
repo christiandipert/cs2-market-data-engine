@@ -5,7 +5,8 @@ import hmac
 import hashlib
 from datetime import datetime
 from typing import Dict, List, Optional
-from data_fetch.keys.BITSKINS import BITSKINS_API_KEY
+from keys.BITSKINS import BITSKINS_API_KEY
+from urllib.parse import unquote
 
 class BitskinsClient:
     def __init__(self):
@@ -22,6 +23,10 @@ class BitskinsClient:
             time.sleep(self.rate_limit - (now - self.last_request))
         self.last_request = time.time()
         
+    def _decode_market_hash_name(self, market_hash_name: str) -> str:
+        """Decode URI-encoded market hash name"""
+        return unquote(market_hash_name)
+        
     def _generate_signature(self, nonce: int) -> str:
         """Generate HMAC signature for API authentication"""
         message = f"{self.api_key}{nonce}"
@@ -36,13 +41,14 @@ class BitskinsClient:
         Get the current bid and ask prices for a specific item
         """
         self._rate_limit()
+        decoded_name = self._decode_market_hash_name(market_hash_name)
         nonce = int(time.time())
         signature = self._generate_signature(nonce)
         
         endpoint = f"{self.base_url}/get_price_data_for_items_on_sale"
         params = {
             'app_id': '730',  # CS2 app ID
-            'market_hash_name': market_hash_name,
+            'market_hash_name': decoded_name,
             'code': nonce,
             'api_key': self.api_key,
             'signature': signature
@@ -58,7 +64,7 @@ class BitskinsClient:
                 if items:
                     item = items[0]  # Get the first item
                     return {
-                        'name': market_hash_name,
+                        'name': decoded_name,
                         'lowest_price': float(item.get('lowest_price', 0)),
                         'highest_price': float(item.get('highest_price', 0)),
                         'volume': int(item.get('total_items', 0)),

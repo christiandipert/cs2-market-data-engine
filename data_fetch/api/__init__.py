@@ -1,3 +1,3 @@
-from data_fetch.api.routes import app
+from api.routes import app
 
 __all__ = ['app'] 

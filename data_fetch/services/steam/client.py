@@ -4,10 +4,12 @@ import json
 from typing import Dict, List, Optional
 from enum import Enum
 from datetime import datetime
-from data_fetch.keys.STEAMAPIS import STEAMAPIS_KEY
-from data_fetch.keys.STEAMWEB import STEAMWEB_KEY
-from data_fetch.keys.STEAMLOGIN import STEAMLOGIN_KEY
+from keys.STEAMAPIS import STEAMAPIS_KEY
+from keys.STEAMWEB import STEAMWEB_KEY
+from keys.STEAMLOGIN import STEAMLOGIN_KEY
+import steammarket as sm
 import pickle
+from urllib.parse import unquote
 
 class Games(Enum):
     CS2 = 730
@@ -29,6 +31,10 @@ class SteamClient:
         if now - self.last_request < self.rate_limit:
             time.sleep(self.rate_limit - (now - self.last_request))
         self.last_request = time.time()
+        
+    def _decode_market_hash_name(self, market_hash_name: str) -> str:
+        """Decode URI-encoded market hash name"""
+        return unquote(market_hash_name)
         
     def get_all_items(self, game: Games) -> List[str]:
         """Get all items for a game"""
@@ -69,53 +75,23 @@ class SteamClient:
     def get_price_overview(self, market_hash_name: str) -> Optional[Dict]:
         """Get price overview for a specific item"""
         self._rate_limit()
-        endpoint = f"{self.base_url}/market/priceoverview"
-        params = {
-            'api_key': self.api_key,
-            'market_hash_name': market_hash_name,
-            'appid': 730  # CS2
-        }
+        decoded_name = self._decode_market_hash_name(market_hash_name)
+        item = sm.get_csgo_item(decoded_name, currency='USD')
+        # { 
+        #   'success': True, 
+        #   'lowest_price': '$0.49', 
+        #   'volume': '52', 
+        #   'median_price': '$0.47'
+        # }
+        return item
         
-        try:
-            response = requests.get(endpoint, params=params)
-            response.raise_for_status()
-            data = response.json()
-            
-            if data.get('success'):
-                return {
-                    'lowest_price': float(data.get('lowest_price', 0)),
-                    'volume': int(data.get('volume', 0)),
-                    'median_price': float(data.get('median_price', 0)),
-                    'last_updated': datetime.now().isoformat()
-                }
-            return None
-        except Exception as e:
-            print(f"Error fetching price overview from Steam: {str(e)}")
-            return None
-            
+       
     def get_item_price(self, market_hash_name: str) -> Optional[Dict]:
         """Get current price data for an item"""
         self._rate_limit()
         endpoint = f"{self.base_url}/market/item/{market_hash_name}"
         params = {'api_key': self.api_key}
         
-        try:
-            response = requests.get(endpoint, params=params)
-            response.raise_for_status()
-            data = response.json()
-            
-            if data.get('status') == 'success':
-                item = data.get('data', {})
-                return {
-                    'lowest_price': float(item.get('lowest_price', 0)),
-                    'highest_price': float(item.get('highest_price', 0)),
-                    'volume': int(item.get('volume', 0)),
-                    'last_updated': datetime.now().isoformat()
-                }
-            return None
-        except Exception as e:
-            print(f"Error fetching item price from Steam: {str(e)}")
-            return None
             
     def get_item_orders(self, market_hash_name: str) -> Optional[Dict]:
         """Get buy and sell orders for an item"""
@@ -127,7 +103,7 @@ class SteamClient:
             response = requests.get(endpoint, params=params)
             response.raise_for_status()
             data = response.json()
-            
+            print(data)
             if data.get('status') == 'success':
                 orders = data.get('data', {})
                 return {

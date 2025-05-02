@@ -1,8 +1,8 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from data_fetch.core.market_fetcher import MarketFetcher
-from data_fetch.core.storage import MarketStorage
-from data_fetch.services.steam.client import Games
+from core.market_fetcher import MarketFetcher
+from core.storage import MarketStorage
+from services.steam.client import Games
 
 app = FastAPI(
     title="CS2 Market Data API",
@@ -27,6 +27,28 @@ storage = MarketStorage()
 async def root():
     return {"message": "CS2 Market Data API"}
 
+@app.get("/buff/sell_orders/{item_id}")
+async def get_buff_sell_orders(query: str):
+    """
+    Get sell orders for an item from buff
+    """
+    try:
+        item_id = int(query)
+        return market_fetcher.get_buff_163_sell_orders(item_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid item ID")
+
+@app.get("/buff/item/{item}")
+async def get_buff_item_price(query: str):
+    """
+    Get the price of an item from buff
+    """
+    try:
+        item = int(query)
+        return market_fetcher.get_buff_163_item_price(item)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid item ID")
+
 @app.get("/buff/featured")
 async def get_buff_featured_items():
     """
@@ -41,12 +63,12 @@ async def get_all_items():
     """
     return market_fetcher.get_all_items(Games.CS2)
 
-@app.get("/priceoverview")
+# Uses steammarket wrapper
+@app.get("/priceoverview/{market_hash_name}")
 async def get_price_overview(query: str):
     """
     Get price overview for a specific item. Uses steam client api
     """
-    print("GOT REQUEST FOR " + query)
     return market_fetcher.steam_price_overview(query)
 
 @app.get("/arbitrage")
