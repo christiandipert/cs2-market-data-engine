@@ -72,3 +72,11 @@ class Buff163Wrapper:
         for item in response.json()['data']['items']:
             print(item)
         return response.json()
+
+    def list_goods_tab(self, goods_id: int) -> List[Dict]:
+        self.__rate_limit()
+        endpoint = f'{BASE_URL}/goods/list_goods_tab'
+        params = {
+            'goods_id': goods_id,
+            'page_num': 1,
+        }

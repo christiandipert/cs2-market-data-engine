@@ -3,6 +3,9 @@ from fastapi.middleware.cors import CORSMiddleware
 from core.market_fetcher import MarketFetcher
 from core.storage import MarketStorage
 from services.steam.client import Games
+from services.steam_experimental.steam_experimental_client import SteamExperimentalClient
+from fastapi.responses import JSONResponse
+import json
 
 app = FastAPI(
     title="CS2 Market Data API",
@@ -70,6 +73,14 @@ async def get_price_overview(query: str):
     Get price overview for a specific item. Uses steam client api
     """
     return market_fetcher.steam_price_overview(query)
+
+@app.get("/orderladder/{market_hash_name}")
+async def get_order_ladder(market_hash_name: str):
+    """
+    Get order ladder for a specific item. Uses steam experimental client api
+    """
+    df = market_fetcher.get_steam_order_ladder(market_hash_name, levels=40)
+    return JSONResponse(content=json.loads(df.to_json(orient='split')))
 
 @app.get("/arbitrage")
 async def get_arbitrage_opportunities():

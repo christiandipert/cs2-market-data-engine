@@ -3,12 +3,16 @@ from datetime import datetime
 from services.steam.client import SteamClient, Games
 from services.bitskins.client import BitskinsClient
 from services.buff163.buff163_client import Buff163Wrapper
+import pandas as pd
+from services.steam_experimental.steam_experimental_client import SteamExperimentalClient
+import tkinter as tk
 
 class MarketFetcher:
     def __init__(self):
         self.steam_client = SteamClient()
         self.bitskins_client = BitskinsClient()
         self.buff163_client = Buff163Wrapper()
+        self.steam_experimental_client = SteamExperimentalClient()
 
     # Gets the current featured market items from buff
     def get_buff_163_featured(self):
@@ -44,6 +48,13 @@ class MarketFetcher:
         Get popular items for a game
         """
         return self.steam_client.get_popular_items(game)
+
+    def get_steam_order_ladder(self, market_hash_name: str, levels: int = 30, refresh_interval: int = 20) -> pd.DataFrame:
+        df = self.steam_experimental_client.get_order_ladder(market_hash_name, refresh_interval)
+        # If the DataFrame has both bids and asks, filter to top N levels for each
+        if hasattr(df, 'head'):
+            return df.head(levels)
+        return df
 
     def steam_price_overview(self, market_hash_name: str) -> Optional[Dict]:
         """
