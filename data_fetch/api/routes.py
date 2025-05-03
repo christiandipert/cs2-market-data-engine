@@ -79,7 +79,7 @@ async def get_order_ladder(market_hash_name: str):
     """
     Get order ladder for a specific item. Uses steam experimental client api
     """
-    df = market_fetcher.get_steam_order_ladder(market_hash_name, levels=40)
+    df = market_fetcher.get_steam_order_ladder(market_hash_name)
     return JSONResponse(content=json.loads(df.to_json(orient='split')))
 
 @app.get("/arbitrage")

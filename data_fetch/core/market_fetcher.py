@@ -49,11 +49,9 @@ class MarketFetcher:
         """
         return self.steam_client.get_popular_items(game)
 
-    def get_steam_order_ladder(self, market_hash_name: str, levels: int = 30, refresh_interval: int = 20) -> pd.DataFrame:
+    def get_steam_order_ladder(self, market_hash_name: str, refresh_interval: int = 20) -> pd.DataFrame:
         df = self.steam_experimental_client.get_order_ladder(market_hash_name, refresh_interval)
         # If the DataFrame has both bids and asks, filter to top N levels for each
-        if hasattr(df, 'head'):
-            return df.head(levels)
         return df
 
     def steam_price_overview(self, market_hash_name: str) -> Optional[Dict]:

@@ -26,55 +26,24 @@ _FIVE_MINUTES = 300
 class SteamExperimentalClient:
     def __init__(self):
         self.cookie = {'steamLoginSecure': STEAMLOGIN_KEY}
-        self._order_ladder_cache = {}
-        self._refresh_threads = {}
         self._request_sessions = {}  # Store persistent Request objects
 
     def get_item_data(self, item_name: str):
         pass
 
     def get_order_ladder(self, item_name: str, refresh_interval: int = None) -> pd.DataFrame:
-        if refresh_interval is not None:
-            # Start background refresh if not already running
-            if item_name not in self._refresh_threads:
-                thread = threading.Thread(
-                    target=self._background_refresh,
-                    args=(item_name, refresh_interval),
-                    daemon=True
-                )
-                self._refresh_threads[item_name] = thread
-                thread.start()
-            # Return cached value if available
-            if item_name in self._order_ladder_cache:
-                return self._order_ladder_cache[item_name]
-        # Fallback: fetch immediately
-        return self._fetch_order_ladder(item_name)
+        # Always use a persistent Request object for this item
+        req = self._get_request_session(item_name)
+        return req.get_buysell_orders(
+            appid=str(Games['CS2']),
+            item_name=item_name,
+        )
 
     def _get_request_session(self, item_name: str):
         # Only create a new Request object if one doesn't exist
         if item_name not in self._request_sessions:
             self._request_sessions[item_name] = Request(steamLoginSecure=self.cookie['steamLoginSecure'])
         return self._request_sessions[item_name]
-
-    def _fetch_order_ladder(self, item_name: str) -> pd.DataFrame:
-        req = self._get_request_session(item_name)
-        out: pd.DataFrame = req.get_buysell_orders(
-            appid=str(Games['CS2']),
-            item_name=item_name,
-        )
-        return out
-
-    def _background_refresh(self, item_name: str, refresh_interval: int):
-        req = self._get_request_session(item_name)
-        while True:
-            try:
-                self._order_ladder_cache[item_name] = req.get_buysell_orders(
-                    appid=str(Games['CS2']),
-                    item_name=item_name,
-                )
-            except Exception as e:
-                print(f"Error refreshing order ladder for {item_name}: {e}")
-            time.sleep(refresh_interval)
 
     # Only gets ran once
     def _get_all_items(self, game: int):
