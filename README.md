@@ -6,6 +6,6 @@ Here is an example image of the order ladder (currently missing the fair value e
 ![Chroma 2 Case (~740pm on 5/2/25)](images/example.png)
 
 # Setup
-Use pip to install requirements via
+- Use pip to install requirements via
   ```pip install -r requirements.txt```
-Add API keys under `keys/` directory
+- Add API keys under `keys/` directory
