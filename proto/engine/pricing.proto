@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package engine;
+
+service AggregatePricingData {
+    rpc getCalculatedFairValues(UpdatedPrices) returns (OrderbookFairValues);
+    rpc sendCalculatedFairValue(NormalizedItemPricing) returns (CalculatedFairValue);
+}
+
+/* Normalized item price */
+message NormalizedItemPricing {
+    string market_hash_name = 0;
+    double item_price = 1;
+    string market_source = 2;
+}
+
+/* Will contain a repeat of NormalizedItemPricing */
+message UpdatedPrices {
+    repeated NormalizedItemPricing prices = 1;
+}
+
+/* Singular fair value calculation */
+message CalculatedFairValue {
+    string item_id = 1;
+    double fair_value = 2;
+}
+
+/* Will contain a repeat of CalculatedFairValues */
+message OrderbookFairValues {
+    repeated CalculatedFairValue fair_values = 1;
+}
